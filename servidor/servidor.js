@@ -13,10 +13,9 @@ app.use(bodyParser.urlencoded({
 
 app.use(bodyParser.json());
 
+app.get('/competencias/:id/:opciones',controladordecompetencias.buscaopciones);
 
 app.get('/competencias',controladordecompetencias.buscacompetencias);
-//app.get('/peliculas', peliculasControlador.buscapeliculas);
-//app.get('/generos', peliculasControlador.buscageneros);
 
 //app.get('/peliculas/:id',peliculasControlador.buscaInformacion);
 
