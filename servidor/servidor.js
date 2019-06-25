@@ -2,7 +2,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var cors = require('cors');
-var controladordecompetencias = require('../controladores/controladordecompetencias');
+var controladordecompetencias = require('../controladores/competenciascontroller');
 var app = express();
 
 app.use(cors());
