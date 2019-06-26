@@ -13,11 +13,11 @@ app.use(bodyParser.urlencoded({
 
 app.use(bodyParser.json());
 
-app.get('/competencias/:id/:opciones',controladordecompetencias.buscaopciones);
+app.get('/competencias/:id/peliculas',controladordecompetencias.buscaopciones);
 
 app.get('/competencias',controladordecompetencias.buscacompetencias);
 
-//app.get('/peliculas/:id',peliculasControlador.buscaInformacion);
+app.post('/competencias/:id/voto',controladordecompetencias.cargavoto);
 
 //seteamos el puerto en el cual va a escuchar los pedidos la aplicación
 var puerto = '8080';
