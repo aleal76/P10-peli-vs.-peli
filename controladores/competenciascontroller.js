@@ -45,7 +45,7 @@ function buscaopciones(req, res) {
                 console.log("Hubo un error en la consulta opciones", error.message);
                 return res.status(404).send("Hubo un error en la consulta opciones");
             }
-            if (resultado[0] == '') {
+            if (resultado == '') {
                 console.log("Hubo un error en la consulta opciones, competencia inexistente");
                 return res.status(404).send("Hubo un error en la consulta opciones, competencia inexistente");
             }
@@ -116,25 +116,38 @@ function cargavoto(req, res) {
 
 //select * from pelicula join voto on pelicula.id = voto.pelicula_id where competencia_id = 3 order by votos desc limit 3
 function buscaresultados(req, res) {
-    console.log("aquí en buscaresultados", req.params.id);
-    var sql = 'select * from pelicula join voto on pelicula.id = voto.pelicula_id where competencia_id = ' + req.params.id + ' order by votos desc limit 3;';
-
-    //se ejecuta la consulta
+    // veo si existe la competencia
+    var sql = 'select nombre from  competencia where id = ' + req.params.id + ';';
     con.query(sql, function (error, resultado, fields) {
         //si hubo un error, se informa y se envía un mensaje de error
         if (error) {
-            console.log("Hubo un error en la consulta competencias", error.message);
-            return res.status(404).send("Hubo un error en la consulta competencias");
+            console.log("Hubo un error en la consulta de resultados", error.message);
+            return res.status(404).send("Hubo un error en la consulta de resultados");
         }
-        //se envía la respuesta
-        response = {
-            resultados: resultado
+         if (resultado == '') {
+            console.log("Hubo un error en la consulta de resultados, competencia inexistente");
+            return res.status(404).send("Hubo un error en la consulta de resultados, competencia inexistente");
         }
-        res.send(JSON.stringify(response));
+        //sin existe la competencia se buscan los resultados
+        //console.log("aquí en buscaresultados", req.params.id);
+        var sql = 'select * from pelicula join voto on pelicula.id = voto.pelicula_id where competencia_id = ' + req.params.id + ' order by votos desc limit 3;';
 
+        //se ejecuta la consulta
+        con.query(sql, function (error, resultado, fields) {
+            //si hubo un error, se informa y se envía un mensaje de error
+            if (error) {
+                console.log("Hubo un error en la consulta competencias", error.message);
+                return res.status(404).send("Hubo un error en la consulta competencias");
+            }
+            //se envía la respuesta
+            response = {
+                resultados: resultado
+            }
+            res.send(JSON.stringify(response));
+
+        });
     });
 }
-
 
 module.exports = {
     buscacompetencias: buscacompetencias,
