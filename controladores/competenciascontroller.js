@@ -62,26 +62,83 @@ function buscaopciones(req, res) {
 // Request URL: http://127.0.0.1:8080/competencias/2/voto
 
 function cargavoto(req, res) {
-    // trae todo género, no hay filtro
-    console.log("aquí en cargavoto",req.params);
-   
-    //se ejecuta la consulta
-    // con.query(sql, function (error, resultado, fields) {
-    //     //si hubo un error, se informa y se envía un mensaje de error
-    //     if (error) {
-    //         console.log("Hubo un error en la consulta competencias", error.message);
-    //         return res.status(404).send("Hubo un error en la consulta competencias");
-    //     }
-    //     //se envía la respuesta
-    //     res.send(JSON.stringify(resultado));
+    var idcompetencia = req.params.id;
+    var idpelicula = req.body.idPelicula;
+    console.log(idcompetencia, idpelicula);
 
-    // });
+    //primero veo si ya tiene algún voto esa película, de ser así incremento el contador cantidad 
+
+    //idpelicula = 31;
+    var sql = 'select votos from voto where pelicula_id = ' + idpelicula + ';';
+    console.log(sql);
+    con.query(sql, function (error, resultado, fields) {
+        //si hubo un error, se informa y se envía un mensaje de error
+        if (error) {
+            console.log("Hubo un error en la consulta resultado", error.message);
+            return res.status(404).send("Hubo un error en la consulta competencias");
+        }
+        //console.log("se realizó,",sql,idpelicula);
+        //se envía la respuesta
+        if (resultado[0] == undefined) {
+            //creo nuevo registro con votos 1
+            var sql = 'insert into voto (competencia_id, pelicula_id, votos) values (' + idcompetencia + ',' + idpelicula + ', 1 );';
+            // ejecutamos la inserción
+            con.query(sql, function (error, resultado, fields) {
+                //si hubo un error, se informa y se envía un mensaje de error
+                if (error) {
+                    console.log("Hubo un error en cargavoto", error.message);
+                    return res.status(404).send("Hubo un error en cargavoto");
+                }
+                console.log("no estaba esa peli por eso se realizó,", sql);
+                return res.status(200).send("Voto registrado");
+            });
+        } else {
+            //solamente incremento votos en el registro actual
+            var votosprevios = parseInt(Object.values(resultado[0]));
+            var sql = 'UPDATE voto SET votos = ' + (votosprevios + 1) + ' WHERE pelicula_id = ' + idpelicula + ';';
+            // ejecutamos la inserción
+            con.query(sql, function (error, resultado, fields) {
+                //si hubo un error, se informa y se envía un mensaje de error
+                if (error) {
+                    console.log("Hubo un error en cargavoto", error.message);
+                    return res.status(404).send("Hubo un error en cargavoto");
+                }
+                console.log("si ya estaba esa peli y se realizó,", sql);
+                return res.status(200).send("Voto registrado");
+            });
+
+
+
+
+        }
+    });
 }
 
+//select * from pelicula join voto on pelicula.id = voto.pelicula_id where competencia_id = 3 order by votos desc limit 3
+function buscaresultados(req, res) {
+    console.log("aquí en buscaresultados", req.params.id);
+    var sql = 'select * from pelicula join voto on pelicula.id = voto.pelicula_id where competencia_id = ' + req.params.id + ' order by votos desc limit 3;';
+
+    //se ejecuta la consulta
+    con.query(sql, function (error, resultado, fields) {
+        //si hubo un error, se informa y se envía un mensaje de error
+        if (error) {
+            console.log("Hubo un error en la consulta competencias", error.message);
+            return res.status(404).send("Hubo un error en la consulta competencias");
+        }
+        //se envía la respuesta
+        response = {
+            resultados: resultado
+        }
+        res.send(JSON.stringify(response));
+
+    });
+}
 
 
 module.exports = {
     buscacompetencias: buscacompetencias,
     buscaopciones: buscaopciones,
-    cargavoto : cargavoto
+    cargavoto: cargavoto,
+    buscaresultados: buscaresultados
 } 

@@ -170,6 +170,11 @@ function CompetenciasController () {
 	},
 	this.cargarResultados =  function (id, data){
 		// Se carga el nombre de la competencia en el contenedor del título
+
+		console.log(data.competencia);
+		console.log(data.resultados[0]);
+		console.log(data.resultados[1]);
+		
 		$("#nombreCompetencia").text(data.competencia);
 		// Se recorren los resultados (data es un array)
 		for (var i = 0; i < data.resultados.length; i++) {

@@ -19,6 +19,8 @@ app.get('/competencias',controladordecompetencias.buscacompetencias);
 
 app.post('/competencias/:id/voto',controladordecompetencias.cargavoto);
 
+app.get('/competencias/:id/resultados',controladordecompetencias.buscaresultados);
+
 //seteamos el puerto en el cual va a escuchar los pedidos la aplicación
 var puerto = '8080';
 
