@@ -2,7 +2,7 @@ var con = require('../servidor/conexionbd');
 //console.log(con);
 
 function buscacompetencias(req, res) {
-    // trae todo género, no hay filtro
+    // trae las competencias, no hay filtro
     var sql = 'select * from  competencia';
     //se ejecuta la consulta
     con.query(sql, function (error, resultado, fields) {
@@ -124,7 +124,7 @@ function buscaresultados(req, res) {
             console.log("Hubo un error en la consulta de resultados", error.message);
             return res.status(404).send("Hubo un error en la consulta de resultados");
         }
-         if (resultado == '') {
+        if (resultado == '') {
             console.log("Hubo un error en la consulta de resultados, competencia inexistente");
             return res.status(404).send("Hubo un error en la consulta de resultados, competencia inexistente");
         }
@@ -149,9 +149,94 @@ function buscaresultados(req, res) {
     });
 }
 
+
+function creacompetencias(req, res) {
+
+    var nombre = req.body.nombre;
+    console.log(nombre);
+    var sql1 = 'select * from competencia where nombre = "' + nombre + '";';
+    var sql = 'insert into competencia (nombre) values ("' + nombre + '");';
+    //se ejecuta la consulta
+    con.query(sql1, function (error, resultado, fields) {
+        //si hubo un error, se informa y se envía un mensaje de error
+        if (error) {
+            console.log("Hubo un error en la creacion de competencias", error.message);
+            return res.status(404).send("Hubo un error en la consulta competencias");
+        }
+        console.log("devolvió", resultado);
+        if (resultado != '') {
+            console.log("Hubo un error en la creación, la competencia ya existe");
+            return res.status(404).send("Hubo un error en la creación, la competencia ya existe");
+        }
+        con.query(sql, function (error, resultado, fields) {
+            //si hubo un error, se informa y se envía un mensaje de error
+            if (error) {
+                console.log("Hubo un error en la creacion de competencias", error.message);
+                return res.status(404).send("Hubo un error en la consulta competencias");
+            }
+            //se envía la respuesta
+            return res.status(200).send("Competencia Creada");
+
+        });
+
+    });
+}
+
+function buscageneros(req, res) {
+    // trae todo género, no hay filtro
+    var sql = 'select * from  genero';
+    //se ejecuta la consulta
+    con.query(sql, function (error, resultado, fields) {
+        //si hubo un error, se informa y se envía un mensaje de error
+        if (error) {
+            console.log("Hubo un error en la consulta generos", error.message);
+            return res.status(404).send("Hubo un error en la consulta generos");
+        }
+        //se envía la respuesta
+        res.send(JSON.stringify(resultado));
+
+    });
+}
+
+function buscadirectores(req, res) {
+    // trae todos los directores, no hay filtro
+    var sql = 'select * from  director';
+    //se ejecuta la consulta
+    con.query(sql, function (error, resultado, fields) {
+        //si hubo un error, se informa y se envía un mensaje de error
+        if (error) {
+            console.log("Hubo un error en la consulta directores", error.message);
+            return res.status(404).send("Hubo un error en la consulta irectores");
+        }
+        //se envía la respuesta
+        res.send(JSON.stringify(resultado));
+
+    });
+}
+
+function buscaactores(req, res) {
+    // trae todos los directores, no hay filtro
+    var sql = 'select * from  actor';
+    //se ejecuta la consulta
+    con.query(sql, function (error, resultado, fields) {
+        //si hubo un error, se informa y se envía un mensaje de error
+        if (error) {
+            console.log("Hubo un error en la consulta actores", error.message);
+            return res.status(404).send("Hubo un error en la consulta actores");
+        }
+        //se envía la respuesta
+        res.send(JSON.stringify(resultado));
+
+    });
+}
+
 module.exports = {
     buscacompetencias: buscacompetencias,
     buscaopciones: buscaopciones,
     cargavoto: cargavoto,
-    buscaresultados: buscaresultados
+    buscaresultados: buscaresultados,
+    creacompetencias: creacompetencias,
+    buscageneros : buscageneros,
+    buscadirectores : buscadirectores,
+    buscaactores : buscaactores
 } 
