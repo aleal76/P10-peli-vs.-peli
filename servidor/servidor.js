@@ -17,9 +17,9 @@ app.get('/competencias/:id/peliculas',controladordecompetencias.buscaopciones);
 
 app.get('/competencias',controladordecompetencias.buscacompetencias);
 
-app.post('/competencias/:id/voto',controladordecompetencias.cargavoto);
+app.get('/competencias/:id',controladordecompetencias.buscaunacompetencia);
 
-app.get('/competencias/:id/resultados',controladordecompetencias.buscaresultados);
+app.post('/competencias/:id/voto',controladordecompetencias.cargavoto);
 
 app.get('/competencias/:id/resultados',controladordecompetencias.buscaresultados);
 
@@ -30,7 +30,16 @@ app.get('/generos', controladordecompetencias.buscageneros);
 app.get('/directores', controladordecompetencias.buscadirectores);
 
 app.get('/actores', controladordecompetencias.buscaactores);
+
+app.delete('/competencias/:id/votos',controladordecompetencias.reiniciacompetencia); //borra los votos nada mas
+
+app.delete('/competencias/:id',controladordecompetencias.eliminacompetencia); /// elimina la competencia
+
+
 //seteamos el puerto en el cual va a escuchar los pedidos la aplicación
+
+
+
 var puerto = '8080';
 
 app.listen(puerto, function () {

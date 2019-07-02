@@ -1,5 +1,4 @@
 var con = require('../servidor/conexionbd');
-//console.log(con);
 
 function buscacompetencias(req, res) {
     // trae las competencias, no hay filtro
@@ -22,7 +21,6 @@ function buscacompetencias(req, res) {
 function buscaopciones(req, res) {
     var cantidadpeliculas;
     var sqlq = 'select count(*) from pelicula';
-    console.log("enopciones", Object.values(req.params.id[0]));
     con.query(sqlq, function (error, resultado, fields) {
         //si hubo un error, se informa y se envía un mensaje de error
         if (error) {
@@ -31,13 +29,11 @@ function buscaopciones(req, res) {
         }
         //se envía la respuesta
         cantidadpeliculas = parseInt(Object.values(resultado[0]));
-        //console.log(cantidadpeliculas);
         // trae todo género, no hay filtro
         var sql1 = 'select nombre from  competencia where id = ' + req.params.id + ';';
         var random1 = Math.round(Math.random() * cantidadpeliculas);
         var random2 = Math.round(Math.random() * cantidadpeliculas);
         var sql2 = 'select * from pelicula where id = ' + random1 + ' or id = ' + random2 + ';'
-        //console.log("sql", sql1+sql2);
         //se ejecuta la consulta
         con.query(sql1 + sql2, [1, 2], function (error, resultado, fields) {
             //si hubo un error, se informa y se envía un mensaje de error
@@ -59,25 +55,19 @@ function buscaopciones(req, res) {
         });
     });
 }
-// Request URL: http://127.0.0.1:8080/competencias/2/voto
 
 function cargavoto(req, res) {
     var idcompetencia = req.params.id;
     var idpelicula = req.body.idPelicula;
-    console.log(idcompetencia, idpelicula);
-
     //primero veo si ya tiene algún voto esa película, de ser así incremento el contador cantidad 
 
-    //idpelicula = 31;
     var sql = 'select votos from voto where pelicula_id = ' + idpelicula + ';';
-    console.log(sql);
     con.query(sql, function (error, resultado, fields) {
         //si hubo un error, se informa y se envía un mensaje de error
         if (error) {
             console.log("Hubo un error en la consulta resultado", error.message);
             return res.status(404).send("Hubo un error en la consulta competencias");
         }
-        //console.log("se realizó,",sql,idpelicula);
         //se envía la respuesta
         if (resultado[0] == undefined) {
             //creo nuevo registro con votos 1
@@ -89,7 +79,6 @@ function cargavoto(req, res) {
                     console.log("Hubo un error en cargavoto", error.message);
                     return res.status(404).send("Hubo un error en cargavoto");
                 }
-                console.log("no estaba esa peli por eso se realizó,", sql);
                 return res.status(200).send("Voto registrado");
             });
         } else {
@@ -103,18 +92,12 @@ function cargavoto(req, res) {
                     console.log("Hubo un error en cargavoto", error.message);
                     return res.status(404).send("Hubo un error en cargavoto");
                 }
-                console.log("si ya estaba esa peli y se realizó,", sql);
                 return res.status(200).send("Voto registrado");
             });
-
-
-
-
         }
     });
 }
 
-//select * from pelicula join voto on pelicula.id = voto.pelicula_id where competencia_id = 3 order by votos desc limit 3
 function buscaresultados(req, res) {
     // veo si existe la competencia
     var sql = 'select nombre from  competencia where id = ' + req.params.id + ';';
@@ -129,9 +112,7 @@ function buscaresultados(req, res) {
             return res.status(404).send("Hubo un error en la consulta de resultados, competencia inexistente");
         }
         //sin existe la competencia se buscan los resultados
-        //console.log("aquí en buscaresultados", req.params.id);
         var sql = 'select * from pelicula join voto on pelicula.id = voto.pelicula_id where competencia_id = ' + req.params.id + ' order by votos desc limit 3;';
-
         //se ejecuta la consulta
         con.query(sql, function (error, resultado, fields) {
             //si hubo un error, se informa y se envía un mensaje de error
@@ -151,9 +132,7 @@ function buscaresultados(req, res) {
 
 
 function creacompetencias(req, res) {
-
     var nombre = req.body.nombre;
-    console.log(nombre);
     var sql1 = 'select * from competencia where nombre = "' + nombre + '";';
     var sql = 'insert into competencia (nombre) values ("' + nombre + '");';
     //se ejecuta la consulta
@@ -163,7 +142,6 @@ function creacompetencias(req, res) {
             console.log("Hubo un error en la creacion de competencias", error.message);
             return res.status(404).send("Hubo un error en la consulta competencias");
         }
-        console.log("devolvió", resultado);
         if (resultado != '') {
             console.log("Hubo un error en la creación, la competencia ya existe");
             return res.status(404).send("Hubo un error en la creación, la competencia ya existe");
@@ -176,9 +154,7 @@ function creacompetencias(req, res) {
             }
             //se envía la respuesta
             return res.status(200).send("Competencia Creada");
-
         });
-
     });
 }
 
@@ -215,7 +191,7 @@ function buscadirectores(req, res) {
 }
 
 function buscaactores(req, res) {
-    // trae todos los directores, no hay filtro
+    // trae todos los actores, no hay filtro
     var sql = 'select * from  actor';
     //se ejecuta la consulta
     con.query(sql, function (error, resultado, fields) {
@@ -230,13 +206,73 @@ function buscaactores(req, res) {
     });
 }
 
+function buscaunacompetencia(req, res) {
+    // trae una competencias, no hay filtro
+    var sql = 'select * from  competencia where id = ' + req.params.id + ';';
+    //se ejecuta la consulta
+    con.query(sql, function (error, resultado, fields) {
+        //si hubo un error, se informa y se envía un mensaje de error
+        if (error) {
+            console.log("Hubo un error en la consulta competencia", error.message);
+            return res.status(404).send("Hubo un error en la consulta competencias");
+        }
+        //se envía la respuesta
+        res.send(JSON.stringify(resultado[0]));
+    });
+}
+
+function eliminacompetencia(req, res) {
+    console.log(req.params.id);
+    competenciaid = req.params.id;
+    var sql = 'delete from voto where competencia_id = ' + competenciaid + ';';
+    //se ejecuta el query
+    con.query(sql, function (error, resultado, fields) {
+        //si hubo un error, se informa y se envía un mensaje de error
+        if (error) {
+            console.log("Hubo un error en la eliminación de la competencia", error.message);
+            return res.status(404).send("Hubo un error en la eliminación de la competencia");
+        }
+        //se envía la respuesta
+        var sql = 'delete from competencia where id = ' + competenciaid + ';';
+        //se ejecuta el query
+        con.query(sql, function (error, resultado, fields) {
+            //si hubo un error, se informa y se envía un mensaje de error
+            if (error) {
+                console.log("Hubo un error en eliminación de competencias", error.message);
+                return res.status(404).send("Hubo un error en la eliminación de competencias");
+            }
+            //se envía la respuesta
+            return res.status(200).send("Competencia Eliminada");
+
+        });
+    });
+}
+
+function reiniciacompetencia(req, res) {
+    //competenciaid = req.params.id;
+    var sql = 'delete from voto where competencia_id = ' + req.params.id + ';';
+    //se ejecuta el query
+    con.query(sql, function (error, resultado, fields) {
+        //si hubo un error, se informa y se envía un mensaje de error
+        if (error) {
+            console.log("Hubo un error en el reinicio de competencia", error.message);
+            return res.status(404).send("Hubo un error en el reinicio de competencia");
+        }
+        //se envía la respuesta
+        return res.status(200).send("Competencia Reiniciada");
+    });
+}
+
 module.exports = {
     buscacompetencias: buscacompetencias,
     buscaopciones: buscaopciones,
     cargavoto: cargavoto,
     buscaresultados: buscaresultados,
     creacompetencias: creacompetencias,
-    buscageneros : buscageneros,
-    buscadirectores : buscadirectores,
-    buscaactores : buscaactores
+    buscageneros: buscageneros,
+    buscadirectores: buscadirectores,
+    buscaactores: buscaactores,
+    buscaunacompetencia: buscaunacompetencia,
+    eliminacompetencia: eliminacompetencia,
+    reiniciacompetencia: reiniciacompetencia
 } 
