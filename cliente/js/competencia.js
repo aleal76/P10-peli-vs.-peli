@@ -17,10 +17,11 @@ function CompetenciasController () {
 
 	this.cargarCompetencias = function (data){
 		// data es el listado de competencias que retornó la api (un objeto json)
+
 		// Oculto la plantilla
 		$(".competenciaPlantilla").hide();
 		// Se recorren iterativamente, uno a uno, los resultados de competencias
-	    var cantidad = data.length;
+		var cantidad = data.length;
 		var idColor = 1;
 		var idColorCrece = true;
 		for (i = 0; i < cantidad; i++) {
