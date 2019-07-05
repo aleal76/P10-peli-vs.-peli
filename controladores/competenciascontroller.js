@@ -14,7 +14,7 @@ function buscacompetencias(req, res) {
         res.send(JSON.stringify(resultado));
     });
 }
-//primero busca la cantidad de pelíuclas para generar el aleatorio entre todas las películas en la tabla, recién ahí hace el 2do query para traer dos pelís.
+
 function buscaopciones(req, res) {
     var competencia = req.params.id;
     var sql = 'select * from competencia WHERE competencia.id = ' + req.params.id + ';';
@@ -23,47 +23,39 @@ function buscaopciones(req, res) {
         //si hubo un error, se informa y se envía un mensaje de error
         if (error) {
             console.log("Hubo un error en buscando opciones datos competencia", error.message);
-            return res.status(500).send("Hubo un error en la buscando opciones datos competencia ");
+            return res.status(500).send("Hubo un error en la buscando opciones datos competencia");
         }
-
-        console.log(resultado);
-
         var data = Object.values(resultado[0]);
         var id = data[0];
         var nombre = data[1];
         var genero = data[2];
         var actor = data[3];
         var director = data[4];
-
-
-        //console.log("todo junto",data[1]);
         console.log("datos", id, nombre, genero, actor, director);
-        if (genero == null) { genero = 'TRUE'; }
-        else {
-            genero = 'pelicula.genero_id = ' + genero;
+        if (genero == null) {
+            genero = '%';
         }
-        console.log(genero);
-        if (actor == null) { actor = 'TRUE'; }
-        else {
-            actor = 'actor_pelicula.actor_id = ' + actor;
+        if (actor == null) {
+            actor = '%';
         }
-        console.log(actor);
-        if (director == null) { director = 'TRUE'; }
-        else {
-            director = ' director_pelicula.director_id = ' + director;
-        }
-        console.log(director);
-        var sql2 = 'SELECT  pelicula.id, poster, titulo FROM pelicula JOIN director_pelicula ON pelicula.id = director_pelicula.pelicula_id JOIN actor_pelicula on pelicula.id = actor_pelicula.pelicula_id WHERE ' + genero + ' AND ' + actor + ' AND ' + director + ' ORDER BY RAND() LIMIT 2;';
-        console.log("buscaopciones", sql2);
-        con.query(sql2, function (error, resultado, fields) {
+        if (director == null) {
+            director = '%';
+        } // cambio valores null por wildcards
+        var sql = "select pelicula.id, pelicula.poster, pelicula.titulo from pelicula where pelicula.genero_id like '" + genero + "' AND pelicula.director IN (select director.nombre from director where director.id like '" + director + "') and pelicula.id IN (select pelicula_id from actor_pelicula join actor on actor.id = actor_pelicula.actor_id  where actor.id like '" + actor + "') order by  rand() limit 2;";
+        console.log("\nsql\n", sql);
+
+        con.query(sql, function (error, resultado, fields) {
             //si hubo un error, se informa y se envía un mensaje de error
             if (error) {
-                console.log("Hubo un error en la consulta cantidad peliculas", error.message);
-                return res.status(500).send("Hubo un error en la consulta cantidad peliculas");
+                console.log("Hubo un error buscando opciones", error.message);
+                return res.status(500).send("Hubo un error buscando opciones");
             }
-            if (resultado == '') {
-                console.log("Hubo un error en la consulta opciones, competencia inexistente");
-                return res.status(404).send("Hubo un error en la consulta opciones, competencia inexistente");
+            console.log("resultado",resultado);
+            console.log("resultadolenght",resultado.length);
+            
+            if (resultado.length < 2) {
+                console.log("Hubo un error en la consulta, películas insuficientes");
+                return res.status(404).send("Hubo un error en la consulta opciones, películas insuficientes");
             }
 
             //se envía la respuesta si la competencia existe
@@ -160,45 +152,74 @@ function buscaresultados(req, res) {
     });
 }
 
-function creacompetencias(req, res) { // primero veo si existe
-    console.log(req.body);
-    if (req.body.nombre == "")
-     { 
-        console.log("Error, se necesita un nombre para crear la competencia", error.message);
-        return res.status(422).send("Hubo un error en la creación de la competencia (sin nombre");
-        
-     }
+function creacompetencias(req, res) {
+    //veo si nombre no está vacio
+    if (req.body.nombre == "") {
+        console.log("Error, se necesita un nombre para crear la competencia");
+        return res.status(422).send("Hubo un error en la creación de la competencia (sin nombre)");
+    }
+    //ahora ver si existen al menos 2 películas con ese criterio.
+    //validareq.body(req.body);
+    if (req.body.genero == 0) {
+        req.body.genero = '%';
+    }
     if (req.body.actor == 0) {
-        req.body.actor = null;
+        req.body.actor = '%';
     }
     if (req.body.director == 0) {
-        req.body.director = null;
-    }
-    if (req.body.genero == 0) {
-        req.body.genero = null;
-    }
-    var sql1 = 'select * from competencia where nombre = "' + req.body.nombre + '";';
-    var sql2 = 'insert into competencia (nombre,actor_id,director_id,genero_id) values ("' + req.body.nombre + '",' + req.body.actor + ',' + req.body.director + ',' + req.body.genero + ');';
-    //se ejecuta la consulta
-    console.log("aquí creando compe", sql2);
-    con.query(sql1, function (error, resultado, fields) {
+        req.body.director = '%';
+    } // cambio valores nulos por wildcards
+    var sql = "select count(*) from pelicula where pelicula.genero_id like '" + req.body.genero + "' AND pelicula.director IN (select director.nombre from director where director.id like '" + req.body.director + "') and pelicula.id IN (select pelicula_id from actor_pelicula join actor on actor.id = actor_pelicula.actor_id  where actor.id like '" + req.body.actor + "');";
+    console.log("\nsql\n", sql);
+    con.query(sql, function (error, resultado, fields) {
         //si hubo un error, se informa y se envía un mensaje de error
         if (error) {
-            console.log("Hubo un error en la creacion de competencias1", error.message);
-            return res.status(500).send("Hubo un error en la consulta competencias antes de crearla");
+            console.log("Hubo un error en buscando opciones datos competencia", error.message);
         }
-        if (resultado != '') {
-            console.log("Hubo un error en la creación, la competencia ya existe");
-            return res.status(422).send("Hubo un error en la creación, la competencia ya existe");
+        var cantidadopciones = Object.values(resultado[0]);
+        console.log("aquí la papa", cantidadopciones);
+        if (cantidadopciones < 2) {
+            console.log("Hubo un error en la creacion de competencias,  películas insuficientes para el criterio");
+
+            return res.status(422).send("Hubo un error, películas insuficientes para la competencia");
         }
-        con.query(sql2, function (error, resultado, fields) {
+        // si hay al menos 2 paso a la inserción de la competencia
+        console.log("Si hay 2 o ..................................................\n");
+        // primero veo si existe con ese nombre otra competencia.
+        if (req.body.actor == '%') {
+            req.body.actor = null;
+        }
+        if (req.body.director == '%') {
+            req.body.director = null;
+        }
+        if (req.body.genero == '%') {
+            req.body.genero = null;
+        }
+        var sql1 = 'select nombre from competencia where nombre = "' + req.body.nombre + '";';
+        //se ejecuta la consulta
+        con.query(sql1, function (error, resultado, fields) {
             //si hubo un error, se informa y se envía un mensaje de error
             if (error) {
-                console.log("Hubo un error en la creacion de competencias creando", error.message);
-                return res.status(500).send("Hubo un error en la consulta competencias creando");
+                console.log("Hubo un error en la creacion de competencias", error.message);
+                return res.status(500).send("Hubo un error en la consulta competencias antes de crearla");
             }
-            //se envía la respuesta
-            return res.status(200).send("Competencia Creada");
+            console.log("out del insert", resultado);
+
+            if (resultado != '') {
+                console.log("Hubo un error en la creación, la competencia ya existe");
+                return res.status(422).send("Hubo un error en la creación, la competencia ya existe");
+            }
+
+            // no existe la compe así que la inserto
+            var sql2 = 'insert into competencia (nombre,actor_id,director_id,genero_id) values ("' + req.body.nombre + '",' + req.body.actor + ',' + req.body.director + ',' + req.body.genero + ');';
+            con.query(sql2, function (error, resultado, fields) {
+                if (error) {
+                    console.log("Hubo un error en la creacion de competencias creando", error.message);
+                    return res.status(500).send("Hubo un error en la creación de la competencia");
+                }
+                //se envía la respuesta
+                return res.status(200).send("Competencia Creada");
+            });
         });
     });
 }
@@ -267,7 +288,7 @@ function buscaunacompetencia(req, res) {
             return res.status(500).send("Hubo un error en la buscando opciones datos competencia ");
         }
         data = Object.values(resultado[0]);
-        console.log(data);
+        console.log("este es data ras", data);
         competencia = { //objeto que tiene todos los id para buscar la info e las otras tablas
             id: data[0],
             nombre: data[1],
@@ -317,7 +338,7 @@ function buscaunacompetencia(req, res) {
                         respuesta.director_nombre = "";
                     } else {
                         //DESDE AQUI ENVIAR RESPUESTA
-                        respuesta.director_nombre = Object.values(JSON.stringify(resultado));
+                        respuesta.director_nombre = Object.values(resultado[0]);
                     }
                     respuesta.nombre = competencia.nombre;
                     console.log("respuesta competencia", respuesta);
@@ -327,8 +348,6 @@ function buscaunacompetencia(req, res) {
         });
     });
 }
-
-
 
 function eliminacompetencia(req, res) {
     console.log(req.params.id);
@@ -404,5 +423,5 @@ module.exports = {
     buscaunacompetencia: buscaunacompetencia,
     eliminacompetencia: eliminacompetencia,
     reiniciacompetencia: reiniciacompetencia,
-    editacompetencia: editacompetencia
+    editacompetencia: editacompetencia,
 } 
