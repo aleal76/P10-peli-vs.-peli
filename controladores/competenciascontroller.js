@@ -23,7 +23,7 @@ function buscaopciones(req, res) {
         //si hubo un error, se informa y se envía un mensaje de error
         if (error) {
             console.log("Hubo un error en buscando opciones datos competencia", error.message);
-            return res.status(404).send("Hubo un error en la buscando opciones datos competencia ");
+            return res.status(500).send("Hubo un error en la buscando opciones datos competencia ");
         }
 
         console.log(resultado);
@@ -59,7 +59,7 @@ function buscaopciones(req, res) {
             //si hubo un error, se informa y se envía un mensaje de error
             if (error) {
                 console.log("Hubo un error en la consulta cantidad peliculas", error.message);
-                return res.status(404).send("Hubo un error en la consulta cantidad peliculas");
+                return res.status(500).send("Hubo un error en la consulta cantidad peliculas");
             }
             if (resultado == '') {
                 console.log("Hubo un error en la consulta opciones, competencia inexistente");
@@ -89,7 +89,7 @@ function cargavoto(req, res) {
         //si hubo un error, se informa y se envía un mensaje de error
         if (error) {
             console.log("Hubo un error en la consulta resultado", error.message);
-            return res.status(404).send("Hubo un error en la consulta competencias");
+            return res.status(500).send("Hubo un error en la consulta competencias");
         }
         //se envía la respuesta
         if (resultado[0] == undefined) {
@@ -101,7 +101,7 @@ function cargavoto(req, res) {
                 //si hubo un error, se informa y se envía un mensaje de error
                 if (error) {
                     console.log("Hubo un error en cargavoto", error.message);
-                    return res.status(404).send("Hubo un error en cargavoto");
+                    return res.status(500).send("Hubo un error en cargavoto");
                 }
                 return res.status(200).send("Voto registrado");
             });
@@ -115,7 +115,7 @@ function cargavoto(req, res) {
                 //si hubo un error, se informa y se envía un mensaje de error
                 if (error) {
                     console.log("Hubo un error en cargavoto", error.message);
-                    return res.status(404).send("Hubo un error en cargavoto");
+                    return res.status(500).send("Hubo un error en cargavoto");
                 }
                 return res.status(200).send("Voto registrado");
             });
@@ -131,7 +131,7 @@ function buscaresultados(req, res) {
         //si hubo un error, se informa y se envía un mensaje de error
         if (error) {
             console.log("Hubo un error en la consulta de resultados", error.message);
-            return res.status(404).send("Hubo un error en la consulta de resultados");
+            return res.status(500).send("Hubo un error en la consulta de resultados");
         }
         if (resultado == '') {
             console.log("Hubo un error en la consulta de resultados, competencia inexistente");
@@ -146,7 +146,7 @@ function buscaresultados(req, res) {
             //si hubo un error, se informa y se envía un mensaje de error
             if (error) {
                 console.log("Hubo un error en la consulta competencias", error.message);
-                return res.status(404).send("Hubo un error en la consulta competencias");
+                return res.status(500).send("Hubo un error en la consulta competencias");
             }
             //se envía la respuesta
             response = {
@@ -162,6 +162,12 @@ function buscaresultados(req, res) {
 
 function creacompetencias(req, res) { // primero veo si existe
     console.log(req.body);
+    if (req.body.nombre == "")
+     { 
+        console.log("Error, se necesita un nombre para crear la competencia", error.message);
+        return res.status(422).send("Hubo un error en la creación de la competencia (sin nombre");
+        
+     }
     if (req.body.actor == 0) {
         req.body.actor = null;
     }
@@ -179,17 +185,17 @@ function creacompetencias(req, res) { // primero veo si existe
         //si hubo un error, se informa y se envía un mensaje de error
         if (error) {
             console.log("Hubo un error en la creacion de competencias1", error.message);
-            return res.status(404).send("Hubo un error en la consulta competencias antes de crearla");
+            return res.status(500).send("Hubo un error en la consulta competencias antes de crearla");
         }
         if (resultado != '') {
             console.log("Hubo un error en la creación, la competencia ya existe");
-            return res.status(404).send("Hubo un error en la creación, la competencia ya existe");
+            return res.status(422).send("Hubo un error en la creación, la competencia ya existe");
         }
         con.query(sql2, function (error, resultado, fields) {
             //si hubo un error, se informa y se envía un mensaje de error
             if (error) {
                 console.log("Hubo un error en la creacion de competencias creando", error.message);
-                return res.status(404).send("Hubo un error en la consulta competencias creando");
+                return res.status(500).send("Hubo un error en la consulta competencias creando");
             }
             //se envía la respuesta
             return res.status(200).send("Competencia Creada");
@@ -205,7 +211,7 @@ function buscageneros(req, res) {
         //si hubo un error, se informa y se envía un mensaje de error
         if (error) {
             console.log("Hubo un error en la consulta generos", error.message);
-            return res.status(404).send("Hubo un error en la consulta generos");
+            return res.status(500).send("Hubo un error en la consulta generos");
         }
         //se envía la respuesta
         res.send(JSON.stringify(resultado));
@@ -235,7 +241,7 @@ function buscaactores(req, res) {
         //si hubo un error, se informa y se envía un mensaje de error
         if (error) {
             console.log("Hubo un error en la consulta actores", error.message);
-            return res.status(404).send("Hubo un error en la consulta actores");
+            return res.status(500).send("Hubo un error en la consulta actores");
         }
         //se envía la respuesta
         res.send(JSON.stringify(resultado));
@@ -258,7 +264,7 @@ function buscaunacompetencia(req, res) {
         //si hubo un error, se informa y se envía un mensaje de error
         if (error) {
             console.log("Hubo un error en buscando opciones datos competencia", error.message);
-            return res.status(404).send("Hubo un error en la buscando opciones datos competencia ");
+            return res.status(500).send("Hubo un error en la buscando opciones datos competencia ");
         }
         data = Object.values(resultado[0]);
         console.log(data);
@@ -277,8 +283,8 @@ function buscaunacompetencia(req, res) {
         con.query(sql1, function (error, resultado, fields) {
             //si hubo un error, se informa y se envía un mensaje de error
             if (error) {
-                console.log("Hubo un error en buscagenero", error.message);
-                return res.status(404).send("Hubo un error en la consulta genero");
+                console.log("Hubo un error en busca genero", error.message);
+                return res.status(500).send("Hubo un error en la consulta genero");
             }
             if (resultado == '') {
                 console.log("NO TIENE GENERO");
@@ -290,8 +296,8 @@ function buscaunacompetencia(req, res) {
             con.query(sql2, function (error, resultado, fields) {
                 //si hubo un error, se informa y se envía un mensaje de error
                 if (error) {
-                    console.log("Hubo un error en busca2", error.message);
-                    return res.status(404).send("Hubo un error en la consulta actor");
+                    console.log("Hubo un error en busca actor", error.message);
+                    return res.status(500).send("Hubo un error en la consulta actor");
                 }
                 if (resultado == '') {
                     console.log("NO TIENE director");
@@ -304,17 +310,17 @@ function buscaunacompetencia(req, res) {
                     //si hubo un error, se informa y se envía un mensaje de error
                     if (error) {
                         console.log("Hubo un error en busca3", error.message);
-                        return res.status(404).send("Hubo un error en la consulta genero");
+                        return res.status(500).send("Hubo un error en la consulta director");
                     }
                     if (resultado == '') {
-                        console.log("NO TIENE actor");
+                        console.log("NO TIENE director");
                         respuesta.director_nombre = "";
                     } else {
                         //DESDE AQUI ENVIAR RESPUESTA
                         respuesta.director_nombre = Object.values(JSON.stringify(resultado));
                     }
                     respuesta.nombre = competencia.nombre;
-                    console.log("aqui el poder", respuesta);
+                    console.log("respuesta competencia", respuesta);
                     res.send(JSON.stringify(respuesta));
                 });
             });
@@ -327,13 +333,14 @@ function buscaunacompetencia(req, res) {
 function eliminacompetencia(req, res) {
     console.log(req.params.id);
     competenciaid = req.params.id;
+    // primero eleimino los votos de esa competencia
     var sql = 'delete from voto where competencia_id = ' + competenciaid + ';';
     //se ejecuta el query
     con.query(sql, function (error, resultado, fields) {
         //si hubo un error, se informa y se envía un mensaje de error
         if (error) {
-            console.log("Hubo un error en la eliminación de la competencia", error.message);
-            return res.status(404).send("Hubo un error en la eliminación de la competencia");
+            console.log("Hubo un error en la eliminación de votos de la competencia", error.message);
+            return res.status(500).send("Hubo un error en la eliminación de vptos de la competencia");
         }
         //se envía la respuesta
         var sql = 'delete from competencia where id = ' + competenciaid + ';';
@@ -342,7 +349,7 @@ function eliminacompetencia(req, res) {
             //si hubo un error, se informa y se envía un mensaje de error
             if (error) {
                 console.log("Hubo un error en eliminación de competencias", error.message);
-                return res.status(404).send("Hubo un error en la eliminación de competencias");
+                return res.status(500).send("Hubo un error en la eliminación de competencias");
             }
             //se envía la respuesta
             return res.status(200).send("Competencia Eliminada");
@@ -359,7 +366,7 @@ function reiniciacompetencia(req, res) {
         //si hubo un error, se informa y se envía un mensaje de error
         if (error) {
             console.log("Hubo un error en el reinicio de competencia", error.message);
-            return res.status(404).send("Hubo un error en el reinicio de competencia");
+            return res.status(500).send("Hubo un error en el reinicio de competencia");
         }
         //se envía la respuesta
         return res.status(200).send("Competencia Reiniciada");
@@ -377,7 +384,7 @@ function editacompetencia(req, res) {
         //si hubo un error, se informa y se envía un mensaje de error
         if (error) {
             console.log("Hubo un error en la edición de competencias", error.message);
-            return res.status(404).send("Hubo un error en la consulta competencias edición de competencias");
+            return res.status(500).send("Hubo un error en la consulta competencias edición de competencias");
         }
         //se envía la respuesta
         return res.status(200).send("Competencia editada");
